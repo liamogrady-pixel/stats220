@@ -18,4 +18,4 @@ This is my repo for **STATS 220**.
 - [Libretexts](https://chem.libretexts.org/) _(A great website for chemistry)_
 - [The R textbook](https://r4ds.hadley.nz/) 
 
-A meme that captures how I currently feel about my university studies is ![]([https://c.tenor.com/8druEACXtX8AAAAd/tenor.gif](https://media1.tenor.com/m/zZdrkpD5S4wAAAAC/dhmis-colin-the-computer.gif))
+A meme that captures how I currently feel about my university studies is ![](https://media1.tenor.com/m/zZdrkpD5S4wAAAAC/dhmis-colin-the-computer.gif)
