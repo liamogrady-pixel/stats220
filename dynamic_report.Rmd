@@ -1,0 +1,218 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+
+```
+
+```{css}
+
+.box {
+  /* Layout */
+  display: flex;
+  flex-direction: column;  /* Stack items vertically */
+  justify-content: center; /* Center vertically */
+  align-items: center;     /* Center horizontally */
+  
+  /* Sizing */
+  width: 90%;              /* Responsive width */
+  max-width: 500px;        /* Don't get too huge on desktop */
+  min-height: 250px;       /* Minimum height, but can grow */
+  padding: 10px;           /* Inner spacing */
+  margin: 20px auto;       /* Centers the box on the page */
+
+  /* Styling */
+  text-align: center;      /* Centers the actual text lines */
+  border: 2px solid #222;
+  border-radius: 10px;
+  line-height: 0.2;        /* Adds space between lines for readability */
+}
+```
+
+## Live updates on fencing
+
+I observed every time I fenced someone and recorded information about the bout. This info will help me figure out a bunch of interesting things about my training.
+
+These are some of the questions that I came into the project wondering:
+
+- Am I correctly judging my ability or do I think too highly / lowly of myself?
+- What are the days when I fence the most and when do I fence the least? (This could help me decide whether I should swap one of the days to get more fencing time!)
+- On what days do I win the most points and feel the most confident? (It's important to look for opportunities to step outside my comfort zone!)
+- Is there any truth in the adage that left handed people are better at fencing than right handed ones?
+
+I'll try to answer each of these questions in turn. But first, an overview:
+
+
+
+```{r}
+library(tidyverse)
+# Liam O'Grady 23/03/2026
+# Reading in the data from the csv:
+logged_data <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQoLHACtDmlRnqfu3yJlR5BsyF9sbLJCWd_MXoMLcD43n13D9VpWzUKEmlH0PWy7FMDWxwQjAuW9n4b/pub?output=csv")
+
+# Renaming the data:
+latest_data <- logged_data %>%
+  rename(
+    points_fenced = 2,
+    points_scored = 3,
+    confidence = 4,
+    handedness = 5
+  ) %>%
+  mutate(
+    Timestamp_as_time = as.POSIXct(Timestamp, format = "%m/%d/%Y %H:%M:%S"), # I had to look up how to turn this timestamp row into an actual time
+    Timestamp_as_date = as_date(Timestamp_as_time),
+    day_of_the_week = weekdays(Timestamp_as_time),
+    win_ratio = points_scored/points_fenced
+    
+  )
+
+win_ratio_to_bout_length <- ggplot(latest_data, aes(x=points_fenced,y=win_ratio))+
+  geom_point()+
+  geom_smooth(method = 'lm')
+
+win_ratio_to_handedness <- ggplot(latest_data, aes(x=handedness, y=win_ratio))+
+  geom_boxplot() +
+  geom_jitter(color="black", size=0.4, alpha=0.9)+ # NOTE TO SELF: Try violin here when we have more data
+  labs(title = "Win ratio by handedness",
+       subtitle = "Comparing how well I do against left handed and right handed people")+
+  xlab("Handedness")+
+  ylab("Win ratio")
+
+win_ratio_to_confidence <- ggplot(latest_data, aes(x=confidence, y=win_ratio))+
+  geom_point()+
+  geom_smooth(method = 'lm')+ # This is a nice plot! (maybe)
+  labs(title = "Win ratio by confidence",
+       subtitle = "This graph shows the relationship between how confident I was versus how well I actually did")+
+       xlab("Confidence")+
+       ylab("Win ratio")
+
+confidence_to_bout_length <- ggplot(latest_data, aes(x=confidence, y = points_fenced))+
+  geom_point()+
+  geom_smooth(method = 'lm')
+
+day_to_win_ratio <- ggplot(latest_data, aes(x=day_of_the_week, y=win_ratio))+
+  geom_boxplot()+
+  geom_jitter(color="black", size=0.4, alpha=0.9) # NOTE TO SELF: Try violin here when we have more data
+
+day_to_bout_length <- ggplot(latest_data, aes(x=day_of_the_week, y=points_fenced))+
+  geom_boxplot()+
+  geom_jitter(color="black", size=0.4, alpha=0.9)+ # NOTE TO SELF: Try violin here when we have more data
+  labs(title = "Bout lengths on different days")+
+  xlab("Day of the week")+
+  ylab("Number of points")
+
+day_to_confidence <- ggplot(latest_data, aes(x=day_of_the_week, y=confidence))+
+  geom_boxplot()+
+  geom_jitter(color="black", size=0.4, alpha=0.9)+ # NOTE TO SELF: Try violin here when we have more data
+  labs(title = "Confidence for bouts on different days of the week")+
+  xlab("Day of the week")+
+  ylab("Confidence")
+
+#Plot average bout number against day to see what day is busiest and average win rate against day to see what day is easiest.
+
+data_by_day <- latest_data %>%
+  group_by(day_of_the_week) %>%
+  summarise(
+    avg_points_by_day = sum(points_fenced) / n_distinct(Timestamp_as_date),
+    avg_win_ratio_by_day = mean(win_ratio)
+  )
+
+# Bar charts:
+avg_points_by_day_plot <- ggplot(data_by_day,aes(x=day_of_the_week,y=avg_points_by_day))+
+  geom_col()+
+  labs(title = "How many points do I usually fence on a particular day",
+       subtitle = "(Calculation example: How many points on all Sundays ÷ number of Sundays)")+
+  xlab("Day of the week")+
+  ylab("Average number of points")
+
+avg_win_ratio_by_day_plot <- ggplot(data_by_day,aes(x=day_of_the_week,y=avg_win_ratio_by_day))+
+  geom_col()+
+  labs(title = "Average win ratio for different days")+
+  xlab("Day of the week")+
+  ylab("Win ratio")
+
+# Values of interest
+
+total_points <- sum(latest_data$points_fenced)
+total_scored <- sum(latest_data$points_scored)
+average_win_ratio <- round(mean(latest_data$win_ratio), digits = 3)
+total_bouts <- count(latest_data)
+
+```
+
+
+<div class="box">
+  <h3> Overview </h3>
+  <p> (Since starting the project) </p>
+  <p> I've fenced: `r total_bouts` bouts </p>
+  <p> Which equals: `r total_points` points </p>
+  <p> I've won: `r total_scored` points </p>
+  <p> And the average win ratio for bouts is: `r average_win_ratio` </p>
+</div>
+
+### Am I overestimating / underestimating myself?
+Let's compare the confidence going into a bout to the win ratio. On average, the confidence should be roughly the same as the win ratio. If the confidence is higher on average it means I'm overestimating myself, and if it's lower on average it means I'm underestimating myself. 
+
+This is equivalent to thinking about the gradient of the best fit line between the two. If the gradient is less than 0.1 that means I overestimate myself and vice-versa. 
+
+```{r}
+win_ratio_to_confidence
+# 1. Run the linear model
+model <- lm(win_ratio ~ confidence, data = latest_data)
+# 2. Get the coefficients
+coefficients <- coef(model)
+# 3. Extract the gradient (the slope for 'confidence')
+win_to_conf_grad <- round(coefficients["confidence"], digits = 3)
+
+
+if(win_to_conf_grad > 0.1) {
+  under_or_over = "underestimating"
+} else {
+  under_or_over = "overestimating"
+}
+
+```
+
+The current gradient is `r win_to_conf_grad`. This means that I'm currently **`r under_or_over` ** myself (oh no!), but this could change in future.  
+
+### What days are the most productive?
+
+To find how much fencing I actually get done on a particular day, I've summed the points from ALL the bouts I do on each day, then divided it by the number of times I went to the club on that day. Here are the results:
+
+```{r}
+avg_points_by_day_plot
+most_day = "Sunday"
+least_day = "[placeholder: not enough data yet]"
+
+```
+
+We can see that I do the most fencing on **`r most_day`** and the least on **`r least_day` **. This could help me evaluate whether I should swap out what days I go.
+
+I also wondered how long bouts were on particular days. When more people go to a session, there might be more points overall because there are more people to fence, but the bouts themselves are shorter because it's rude to keep fencing while other people are waiting for a turn. So I looked at the length of bouts themselves on each day: 
+
+```{r}
+day_to_bout_length
+```
+
+### What days are the best (and worst) for me?
+
+Different people go to the fencing sessions on different days, so on some days I might fence opponents at my level, and on others I might fence people a lot better than me. In general, if I'm winning lots of bouts on a particular day I should consider going on a different day instead to get more of a challenge. 
+
+In these graphs we can see how my win ratio and confidence change from day to day. I've presented the average win ratio by giving the mean of all win ratios from that particular weekday.
+
+```{r}
+avg_win_ratio_by_day_plot
+day_to_confidence
+```
+
+### Left or Right?
+
+Finally, I've heard a lot of people say that left handed have an advantage in fencing (and not just in fencing! I've also heard this in a variety of other sports like tennis for example) but is it true? In this plot I compare my winning proportions against left and right handers. There probably isn't enough data to make a conclusion but it's still pretty interesting:
+
+```{r}
+win_ratio_to_handedness
+```
+
