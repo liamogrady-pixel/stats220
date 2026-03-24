@@ -10,6 +10,15 @@ knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
 
 ```{css}
 
+h2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 5px solid Black;
+  border-bottom: 5px solid Black;
+}
+
+
 .box {
   /* Layout */
   display: flex;
@@ -139,23 +148,23 @@ avg_win_ratio_by_day_plot <- ggplot(data_by_day,aes(x=day_of_the_week,y=avg_win_
 total_points <- sum(latest_data$points_fenced)
 total_scored <- sum(latest_data$points_scored)
 average_win_ratio <- round(mean(latest_data$win_ratio), digits = 3)
-total_bouts <- nrow(latest_data)
+total_bouts <- count(latest_data)
 
 ```
 
 
 ::: {.box}
-### Overview
+### [Overview]{style="color: #fc7703; font-weight: bold;"}
 
 (Since starting the project)
 
-I've fenced: `r total_bouts` bouts
+I've fenced: [`r total_bouts`]{style="color: #fc7703; font-weight: bold;"} bouts
 
-Which equals: `r total_points` points
+Which equals: [`r total_points`]{style="color: #fc7703; font-weight: bold;"} points
 
-I've won: `r total_scored` points
+I've won: [`r total_scored`]{style="color: #fc7703; font-weight: bold;"} points
 
-And the average win ratio for bouts is: `r average_win_ratio`
+And the average win ratio for bouts is: [`r average_win_ratio`]{style="color: #fc7703; font-weight: bold;"}
 :::
 
 ### Am I overestimating / underestimating myself?
@@ -181,7 +190,7 @@ if(win_to_conf_grad > 0.1) {
 
 ```
 
-The current gradient is `r win_to_conf_grad`. This means that I'm currently **`r under_or_over` ** myself (oh no!), but this could change in future.  
+The current gradient is `r win_to_conf_grad`. This means that I'm currently [`r under_or_over`]{style="color: #fc7703; font-weight: bold;"} myself (oh no!), but this could change in future.  
 
 ### What days are the most productive?
 
@@ -194,7 +203,7 @@ least_day = "[placeholder: not enough data yet]"
 
 ```
 
-We can see that I do the most fencing on **`r most_day`** and the least on **`r least_day` **. This could help me evaluate whether I should swap out what days I go.
+We can see that I do the most fencing on [`r most_day`]{style="color: #fc7703; font-weight: bold;"} and the least on [`r least_day`]{style="color: #fc7703; font-weight: bold;"}. This could help me evaluate whether I should swap out what days I go.
 
 I also wondered how long bouts were on particular days. When more people go to a session, there might be more points overall because there are more people to fence, but the bouts themselves are shorter because it's rude to keep fencing while other people are waiting for a turn. So I looked at the length of bouts themselves on each day: 
 
