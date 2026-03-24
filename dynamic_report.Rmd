@@ -62,6 +62,8 @@ library(tidyverse)
 # Reading in the data from the csv:
 logged_data <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQoLHACtDmlRnqfu3yJlR5BsyF9sbLJCWd_MXoMLcD43n13D9VpWzUKEmlH0PWy7FMDWxwQjAuW9n4b/pub?output=csv")
 
+my_colors <- c("#FC7703", "#1B3253", "#FDAB27", "#67DEE2", "#46599E")
+
 # Renaming the data:
 latest_data <- logged_data %>%
   rename(
@@ -82,17 +84,17 @@ win_ratio_to_bout_length <- ggplot(latest_data, aes(x=points_fenced,y=win_ratio)
   geom_point()+
   geom_smooth(method = 'lm')
 
-win_ratio_to_handedness <- ggplot(latest_data, aes(x=handedness, y=win_ratio))+
-  geom_boxplot() +
-  geom_jitter(color="black", size=0.4, alpha=0.9)+ # NOTE TO SELF: Try violin here when we have more data
+win_ratio_to_handedness <- ggplot(latest_data, aes(x=handedness, y=win_ratio, fill = handedness))+
+  geom_violin() +
   labs(title = "Win ratio by handedness",
        subtitle = "Comparing how well I do against left handed and right handed people")+
   xlab("Handedness")+
-  ylab("Win ratio")
+  ylab("Win ratio")+
+  scale_fill_manual(values = my_colors)
 
 win_ratio_to_confidence <- ggplot(latest_data, aes(x=confidence, y=win_ratio))+
   geom_point()+
-  geom_smooth(method = 'lm')+ # This is a nice plot! (maybe)
+  geom_smooth(method = 'lm', color = "#FC7703" )+ # This is a nice plot! (maybe)
   labs(title = "Win ratio by confidence",
        subtitle = "This graph shows the relationship between how confident I was versus how well I actually did")+
        xlab("Confidence")+
@@ -106,19 +108,20 @@ day_to_win_ratio <- ggplot(latest_data, aes(x=day_of_the_week, y=win_ratio))+
   geom_boxplot()+
   geom_jitter(color="black", size=0.4, alpha=0.9) # NOTE TO SELF: Try violin here when we have more data
 
-day_to_bout_length <- ggplot(latest_data, aes(x=day_of_the_week, y=points_fenced))+
-  geom_boxplot()+
-  geom_jitter(color="black", size=0.4, alpha=0.9)+ # NOTE TO SELF: Try violin here when we have more data
+day_to_bout_length <- ggplot(latest_data, aes(x=day_of_the_week, y=points_fenced, fill = day_of_the_week))+
+  geom_violin()+
   labs(title = "Bout lengths on different days")+
   xlab("Day of the week")+
-  ylab("Number of points")
+  ylab("Number of points")+
+  scale_fill_manual(values = my_colors)
 
-day_to_confidence <- ggplot(latest_data, aes(x=day_of_the_week, y=confidence))+
-  geom_boxplot()+
-  geom_jitter(color="black", size=0.4, alpha=0.9)+ # NOTE TO SELF: Try violin here when we have more data
+day_to_confidence <- ggplot(latest_data, aes(x=day_of_the_week, y=confidence, fill = day_of_the_week))+
+  geom_violin()+
   labs(title = "Confidence for bouts on different days of the week")+
   xlab("Day of the week")+
-  ylab("Confidence")
+  ylab("Confidence")+
+  scale_fill_manual(values = my_colors)
+  
 
 #Plot average bout number against day to see what day is busiest and average win rate against day to see what day is easiest.
 
@@ -130,18 +133,20 @@ data_by_day <- latest_data %>%
   )
 
 # Bar charts:
-avg_points_by_day_plot <- ggplot(data_by_day,aes(x=day_of_the_week,y=avg_points_by_day))+
+avg_points_by_day_plot <- ggplot(data_by_day,aes(x=day_of_the_week,y=avg_points_by_day, fill = day_of_the_week))+
   geom_col()+
   labs(title = "How many points do I usually fence on a particular day",
        subtitle = "(Calculation example: How many points on all Sundays ÷ number of Sundays)")+
   xlab("Day of the week")+
-  ylab("Average number of points")
+  ylab("Average number of points")+
+  scale_fill_manual(values = my_colors)
 
-avg_win_ratio_by_day_plot <- ggplot(data_by_day,aes(x=day_of_the_week,y=avg_win_ratio_by_day))+
+avg_win_ratio_by_day_plot <- ggplot(data_by_day,aes(x=day_of_the_week,y=avg_win_ratio_by_day, fill = day_of_the_week))+
   geom_col()+
   labs(title = "Average win ratio for different days")+
   xlab("Day of the week")+
-  ylab("Win ratio")
+  ylab("Win ratio")+
+  scale_fill_manual(values = my_colors)
 
 # Values of interest
 
