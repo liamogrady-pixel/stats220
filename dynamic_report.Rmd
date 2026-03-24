@@ -144,14 +144,19 @@ total_bouts <- count(latest_data)
 ```
 
 
-<div class="box">
-  <h3> Overview </h3>
-  <p> (Since starting the project) </p>
-  <p> I've fenced: `r total_bouts` bouts </p>
-  <p> Which equals: `r total_points` points </p>
-  <p> I've won: `r total_scored` points </p>
-  <p> And the average win ratio for bouts is: `r average_win_ratio` </p>
-</div>
+::: {.box}
+### Overview
+
+(Since starting the project)
+
+I've done: `r total_bouts` bouts
+
+Which equals: `r total_points` points
+
+I've won: `r total_scored` points
+
+And the average win ratio for bouts is: `r average_win_ratio`
+:::
 
 ### Am I overestimating / underestimating myself?
 Let's compare the confidence going into a bout to the win ratio. On average, the confidence should be roughly the same as the win ratio. If the confidence is higher on average it means I'm overestimating myself, and if it's lower on average it means I'm underestimating myself. 
