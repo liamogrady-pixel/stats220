@@ -149,7 +149,7 @@ total_bouts <- count(latest_data)
 
 (Since starting the project)
 
-I've done: **`r total_bouts`** bouts
+I've done: `r total_bouts` bouts
 
 Which equals: `r total_points` points
 
