@@ -9,6 +9,9 @@ knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
 ```
 
 ```{css}
+h3 {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
 
 h2 {
   display: flex;
@@ -16,8 +19,19 @@ h2 {
   align-items: center;
   border-top: 5px solid Black;
   border-bottom: 5px solid Black;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+p {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+li {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+body {
+margin: 30px
+}
 
 .box {
   /* Layout */
@@ -41,7 +55,7 @@ h2 {
 }
 ```
 
-## Live updates on fencing
+## Live Updates on Fencing
 
 I observed every time I fenced someone and recorded information about the bout. This info will help me figure out a bunch of interesting things about my training.
 
@@ -195,7 +209,7 @@ if(win_to_conf_grad > 0.1) {
 
 ```
 
-The current gradient is `r win_to_conf_grad`. This means that I'm currently [`r under_or_over`]{style="color: #fc7703; font-weight: bold;"} myself (oh no!), but this could change in future.  
+The current gradient is [`r win_to_conf_grad`]{style="color: #fc7703; font-weight: bold;"}. This means that I'm currently [`r under_or_over`]{style="color: #fc7703; font-weight: bold;"} myself (oh no!), but this could change in future.  
 
 ### What days are the most productive?
 
@@ -234,4 +248,6 @@ Finally, I've heard a lot of people say that left handed have an advantage in fe
 ```{r}
 win_ratio_to_handedness
 ```
+
+That's all for now. My hope is that as I gather more data this report helps me make decisions about how to train effectively, as well as just being a fun statistics project!
 
