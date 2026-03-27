@@ -73,30 +73,46 @@ I'll try to answer each of these questions in turn. But first, an overview:
 ```{r}
 library(tidyverse)
 # Liam O'Grady 23/03/2026
+
+# NOTE: I found any extra functions (like mutate, summarise etc) in the R textbook provided for the course. I realise they aren't required for the project but they give some extra context.
+
+
 # Reading in the data from the csv:
 logged_data <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQoLHACtDmlRnqfu3yJlR5BsyF9sbLJCWd_MXoMLcD43n13D9VpWzUKEmlH0PWy7FMDWxwQjAuW9n4b/pub?output=csv")
 
+# Choosing some nice colours for my charts! (I think this looks good)
+
 my_colors <- c("#FC7703", "#1B3253", "#FDAB27", "#67DEE2", "#46599E")
 
-# Renaming the data:
+# Renaming the data from my form:
 latest_data <- logged_data %>%
   rename(
     points_fenced = 2,
     points_scored = 3,
     confidence = 4,
     handedness = 5
-  ) %>%
+  ) %>% 
   mutate(
-    Timestamp_as_time = as.POSIXct(Timestamp, format = "%m/%d/%Y %H:%M:%S"), # I had to look up how to turn this timestamp row into an actual time
-    Timestamp_as_date = as_date(Timestamp_as_time),
-    day_of_the_week = weekdays(Timestamp_as_time),
-    win_ratio = points_scored/points_fenced
+    Timestamp_as_time = as.POSIXct(Timestamp, format = "%m/%d/%Y %H:%M:%S"), # I had to look up how to turn this timestamp row into an actual time because I want to compare different days of the week. This was definitely the hardest and most confusing part of the project.
+    Timestamp_as_date = as_date(Timestamp_as_time), # Turning that time into a date
+    day_of_the_week = weekdays(Timestamp_as_time), # Turning that date into a day of the week so I can compare different days
+    win_ratio = points_scored/points_fenced # This adds a column to find the percentage of the bout that I won.
     
   )
 
-win_ratio_to_bout_length <- ggplot(latest_data, aes(x=points_fenced,y=win_ratio))+
-  geom_point()+
-  geom_smooth(method = 'lm')
+
+
+
+
+
+
+# I'll now begin to define some plots. These first four aren't required by the project, but are just for some extra context and for my personal use. The bar charts required are further down.
+
+
+
+
+
+
 
 win_ratio_to_handedness <- ggplot(latest_data, aes(x=handedness, y=win_ratio, fill = handedness))+
   geom_violin() +
@@ -104,7 +120,8 @@ win_ratio_to_handedness <- ggplot(latest_data, aes(x=handedness, y=win_ratio, fi
        subtitle = "Comparing how well I do against left handed and right handed people")+
   xlab("Handedness")+
   ylab("Win ratio")+
-  scale_fill_manual(values = my_colors)
+  scale_fill_manual(values = my_colors)+
+  guides(fill = "none")
 
 win_ratio_to_confidence <- ggplot(latest_data, aes(x=confidence, y=win_ratio))+
   geom_point()+
@@ -114,27 +131,21 @@ win_ratio_to_confidence <- ggplot(latest_data, aes(x=confidence, y=win_ratio))+
        xlab("Confidence")+
        ylab("Win ratio")
 
-confidence_to_bout_length <- ggplot(latest_data, aes(x=confidence, y = points_fenced))+
-  geom_point()+
-  geom_smooth(method = 'lm')
-
-day_to_win_ratio <- ggplot(latest_data, aes(x=day_of_the_week, y=win_ratio))+
-  geom_boxplot()+
-  geom_jitter(color="black", size=0.4, alpha=0.9) # NOTE TO SELF: Try violin here when we have more data
-
 day_to_bout_length <- ggplot(latest_data, aes(x=day_of_the_week, y=points_fenced, fill = day_of_the_week))+
   geom_violin()+
   labs(title = "Bout lengths on different days")+
   xlab("Day of the week")+
   ylab("Number of points")+
-  scale_fill_manual(values = my_colors)
+  scale_fill_manual(values = my_colors)+
+  guides(fill = "none")
 
 day_to_confidence <- ggplot(latest_data, aes(x=day_of_the_week, y=confidence, fill = day_of_the_week))+
   geom_violin()+
   labs(title = "Confidence for bouts on different days of the week")+
   xlab("Day of the week")+
   ylab("Confidence")+
-  scale_fill_manual(values = my_colors)
+  scale_fill_manual(values = my_colors)+
+  guides(fill = "none")
   
 
 #Plot average bout number against day to see what day is busiest and average win rate against day to see what day is easiest.
@@ -144,23 +155,36 @@ data_by_day <- latest_data %>%
   summarise(
     avg_points_by_day = sum(points_fenced) / n_distinct(Timestamp_as_date),
     avg_win_ratio_by_day = mean(win_ratio)
-  )
+  ) %>%
+  arrange(desc(avg_points_by_day))
+
 
 # Bar charts:
+# NOTE: I found geom_col() in the coursebook and talked to Liza about using it instead of geom_bar() since both produce what would traditionally be called a "bar chart".
+
+
+
+# Bar chart 1
 avg_points_by_day_plot <- ggplot(data_by_day,aes(x=day_of_the_week,y=avg_points_by_day, fill = day_of_the_week))+
   geom_col()+
   labs(title = "How many points do I usually fence on a particular day",
        subtitle = "(Calculation example: How many points on all Sundays ÷ number of Sundays)")+
   xlab("Day of the week")+
   ylab("Average number of points")+
-  scale_fill_manual(values = my_colors)
+  scale_fill_manual(values = my_colors)+
+  guides(fill = "none")
 
+
+# Bar chart 2
 avg_win_ratio_by_day_plot <- ggplot(data_by_day,aes(x=day_of_the_week,y=avg_win_ratio_by_day, fill = day_of_the_week))+
   geom_col()+
   labs(title = "Average win ratio for different days")+
   xlab("Day of the week")+
   ylab("Win ratio")+
-  scale_fill_manual(values = my_colors)
+  scale_fill_manual(values = my_colors)+
+  guides(fill = "none")
+
+
 
 # Values of interest
 
@@ -217,8 +241,8 @@ To find how much fencing I actually get done on a particular day, I've summed th
 
 ```{r}
 avg_points_by_day_plot
-most_day = "Sunday"
-least_day = "[placeholder: not enough data yet]"
+most_day = data_by_day$day_of_the_week[1]
+least_day = data_by_day$day_of_the_week[-1]
 
 ```
 
