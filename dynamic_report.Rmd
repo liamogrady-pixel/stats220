@@ -191,6 +191,7 @@ avg_win_ratio_by_day_plot <- ggplot(data_by_day,aes(x=day_of_the_week,y=avg_win_
 total_points <- sum(latest_data$points_fenced)
 total_scored <- sum(latest_data$points_scored)
 average_win_ratio <- round(mean(latest_data$win_ratio), digits = 3)
+average_confidence <- round(mean(latest_data$confidence), digits = 3)
 total_bouts <- nrow(latest_data)
 
 ```
@@ -208,6 +209,8 @@ Which equals: [`r total_points`]{style="color: #fc7703; font-weight: bold;"} poi
 I've won: [`r total_scored`]{style="color: #fc7703; font-weight: bold;"} points
 
 And the average win ratio for bouts is: [`r average_win_ratio`]{style="color: #fc7703; font-weight: bold;"}
+
+My average confidence has been: [`r average_confidence`]{style="color: #fc7703; font-weight: bold;"}
 :::
 
 ### Am I overestimating / underestimating myself?
@@ -242,7 +245,7 @@ To find how much fencing I actually get done on a particular day, I've summed th
 ```{r}
 avg_points_by_day_plot
 most_day = data_by_day$day_of_the_week[1]
-least_day = data_by_day$day_of_the_week[-1]
+least_day = data_by_day$day_of_the_week[length(data_by_day$day_of_the_week)]
 
 ```
 
